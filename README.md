@@ -41,6 +41,5 @@ A：新聞來自 EventRegistry API，係一個可信賴嘅新聞聚合平台，�
 **Q：可以唔可以自訂篩選條件？**  
 A：目前平台預設香港同美國嘅中文新聞，未來可能會加入更多自訂選項，敬請期待！
 
-© Copyright © 2025 Wong. All rights reserved 所有新聞內容由 EventRegistry API 提供。
-
 快啲試下「全球新聞探秘」，一鍵探索世界大事！
+© Copyright © 2025 Wong. All rights reserved 所有新聞內容由 EventRegistry API 提供。

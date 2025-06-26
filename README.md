@@ -43,4 +43,6 @@ A：目前平台預設香港同美國嘅中文新聞，未來可能會加入更�
 
 快啲試下「全球新聞探秘」，一鍵探索世界大事！
 
-© Copyright © 2025 Wong. All rights reserved 所有新聞內容由 EventRegistry API 提供。
+© Copyright © 2025 Wong. All rights reserved 
+
+所有新聞內容由 EventRegistry API 提供。

@@ -3,27 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Random News Platform</title>
+    <title>Global News Explorer</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <!-- jQuery CDN -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #f59e0b;
+        }
+        
         body {
-            background: linear-gradient(to bottom, #f3f4f6, #e5e7eb);
+            background: linear-gradient(to bottom, #f8fafc, #f1f5f9);
             min-height: 100vh;
             font-family: 'Inter', sans-serif;
         }
-        .news-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        
+        .title-font {
+            font-family: 'Playfair Display', serif;
         }
+        
+        .news-card {
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border-radius: 12px;
+            overflow: hidden;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
         .news-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
         }
+        
+        .news-image {
+            height: 220px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .news-card:hover .news-image {
+            transform: scale(1.03);
+        }
+        
         .spinner {
-            border: 4px solid #f3f4f6;
-            border-top: 4px solid #3b82f6;
+            border: 4px solid rgba(59, 130, 246, 0.2);
+            border-top: 4px solid var(--primary);
             border-radius: 50%;
             width: 40px;
             height: 40px;
@@ -31,24 +62,161 @@
             display: none;
             margin: 20px auto;
         }
+        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
+        .btn-primary {
+            background: var(--primary);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .tag {
+            display: inline-block;
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--primary);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .read-more {
+            color: var(--primary);
+            font-weight: 500;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .read-more::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: var(--primary);
+            transition: width 0.3s ease;
+        }
+        
+        .read-more:hover::after {
+            width: 100%;
+        }
+        
+        .skeleton {
+            animation: skeleton-loading 1s linear infinite alternate;
+        }
+        
+        @keyframes skeleton-loading {
+            0% {
+                background-color: hsl(200, 20%, 80%);
+            }
+            100% {
+                background-color: hsl(200, 20%, 95%);
+            }
+        }
+        
+        .skeleton-text {
+            width: 100%;
+            height: 0.8rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0.25rem;
+        }
+        
+        .skeleton-text:last-child {
+            margin-bottom: 0;
+            width: 80%;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .news-image {
+                height: 180px;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .news-image {
+                height: 160px;
+                border-radius: 8px 8px 0 0;
+                width: 100%;
+                margin-bottom: 0;
+                margin-right: 0;
+                float: none;
+                max-width: none;
+            }
+        }
     </style>
 </head>
-<body class="flex flex-col items-center justify-center p-4">
-    <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6">Random News Platform</h1>
-    <button id="get-news-btn" class="bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-blue-700 transition duration-300">Get News</button>
-    <div id="loading" class="spinner"></div>
-    <div id="news-container" class="mt-8 w-full max-w-2xl"></div>
+<body class="flex flex-col items-center p-4 md:p-8">
+    <header class="w-full max-w-6xl mb-8 md:mb-12 text-center">
+        <h1 class="title-font text-4xl md:text-5xl font-bold text-gray-900 mb-3">Global News Explorer</h1>
+        <p class="text-gray-600 max-w-2xl mx-auto">Discover the latest news from Hong Kong and the United States</p>
+    </header>
+
+    <main class="w-full max-w-6xl">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-6 md:mb-8 gap-4">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-filter text-gray-500"></i>
+                <span class="text-gray-700 font-medium">Current filters:</span>
+                <span class="tag">Hong Kong</span>
+                <span class="tag">United States</span>
+                <span class="tag">Chinese</span>
+                <span class="tag">Last 14 days</span>
+            </div>
+            <button id="get-news-btn" class="btn-primary text-white font-semibold py-3 px-8 rounded-lg flex items-center gap-2">
+                <i class="fas fa-sync-alt"></i>
+                <span>Get Random News</span>
+            </button>
+        </div>
+
+        <div id="loading" class="spinner"></div>
+        
+        <!-- Skeleton loader for better perceived performance -->
+        <div id="skeleton-loader" class="hidden">
+            <div class="news-card p-6 mb-6">
+                <div class="skeleton h-48 w-full rounded-md mb-4"></div>
+                <div class="skeleton-text"></div>
+                <div class="skeleton-text"></div>
+                <div class="skeleton-text"></div>
+                <div class="skeleton-text"></div>
+                <div class="skeleton-text"></div>
+            </div>
+        </div>
+
+        <div id="news-container" class="grid grid-cols-1 gap-6 md:gap-8"></div>
+        
+        <div id="empty-state" class="hidden text-center py-12">
+            <div class="max-w-md mx-auto">
+                <i class="fas fa-newspaper text-5xl text-gray-300 mb-4"></i>
+                <h3 class="text-xl font-medium text-gray-700 mb-2">No news articles found</h3>
+                <p class="text-gray-500 mb-4">Try adjusting your filters or click the button above to search again.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="mt-12 mb-6 text-center text-gray-500 text-sm">
+        <p>© 2025 Global News Explorer. All news content provided by Event Registry API.</p>
+    </footer>
 
     <script>
         $(document).ready(function() {
             // API endpoint
             const apiUrl = 'http://eventregistry.org/api/v1/article/getArticles';
 
-            // Data for the API request
+            // Data for the API request (adjusted date range and fixed typo)
             const data = {
                 "query": {
                     "$query": {
@@ -60,7 +228,7 @@
                                 ]
                             },
                             {
-                                "dateStart": "2025-06-12",
+                                "dateStart": "2025-06-01", // Adjusted to past date
                                 "dateEnd": "2025-06-26",
                                 "lang": "zho"
                             }
@@ -74,53 +242,127 @@
 
             // Handle button click
             $('#get-news-btn').click(function() {
-                // Show loading spinner
+                // Disable button during load
+                $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i><span>Loading...</span>');
+                
+                // Show loading states
                 $('#loading').show();
-                $('#news-container').empty(); // Clear previous content
+                $('#news-container').empty().hide();
+                $('#empty-state').hide();
+                $('#skeleton-loader').removeClass('hidden').show();
+                
+                // Add slight delay for better UX
+                setTimeout(function() {
+                    $.ajax({
+                        url: apiUrl,
+                        type: "POST",
+                        data: JSON.stringify(data),
+                        contentType: "application/json",
+                        success: function(response) {
+                            console.log('API Response:', response); // Debug log
+                            $('#loading').hide();
+                            $('#skeleton-loader').hide();
+                            $('#news-container').show();
+                            
+                            // Re-enable button
+                            $('#get-news-btn').prop('disabled', false).html('<i class="fas fa-sync-alt"></i><span>Get Random News</span>');
 
-                $.ajax({
-                    url: apiUrl,
-                    type: "POST",
-                    data: JSON.stringify(data),
-                    contentType: "application/json",
-                    success: function(response) {
-                        $('#loading').hide();
+                            // Check if articles are returned
+                            if (response.articles && response.articles.results && response.articles.results.length > 0) {
+                                // Pick a random article
+                                const articles = response.articles.results;
+                                const randomArticle = articles[Math.floor(Math.random() * articles.length)];
 
-                        // Check if articles are returned
-                        if (response.articles && response.articles.results && response.articles.results.length > 0) {
-                            // Pick a random article
-                            const articles = response.articles.results;
-                            const randomArticle = articles[Math.floor(Math.random() * articles.length)];
+                                // Format the article date
+                                const articleDate = new Date(randomArticle.dateTime).toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                });
 
-                            // Format the article date
-                            const articleDate = new Date(randomArticle.dateTime).toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric'
-                            });
+                                // Simplified location parsing
+                                let location = 'Unknown';
+                                if (randomArticle.source && randomArticle.source.uri) {
+                                    if (randomArticle.source.uri.includes('hong_kong')) {
+                                        location = 'Hong Kong';
+                                    } else if (randomArticle.source.uri.includes('usa') || randomArticle.source.uri.includes('united_states')) {
+                                        location = 'United States';
+                                    }
+                                }
 
-                            // Create the article card
-                            const articleHtml = `
-                                <div class="news-card bg-white rounded-lg shadow-lg p-6">
-                                    ${randomArticle.image ? `<img src="${randomArticle.image}" alt="Article Image" class="w-full h-48 object-cover rounded-md mb-4">` : ''}
-                                    <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-2">${randomArticle.title}</h2>
-                                    <p class="text-gray-600 mb-4">${randomArticle.body.substring(0, 200)}...</p>
-                                    <p class="text-sm text-gray-500 mb-2">Source: <a href="${randomArticle.url}" target="_blank" class="text-blue-600 hover:underline">${randomArticle.source.title}</a></p>
-                                    <p class="text-sm text-gray-500">Published: ${articleDate}</p>
+                                // Create the article card
+                                const articleHtml = `
+                                    <div class="news-card">
+                                        <div class="p-6">
+                                            ${randomArticle.image ? `
+                                            <div class="overflow-hidden rounded-lg mb-4">
+                                                <img src="${randomArticle.image}" alt="Article Image" class="news-image w-full">
+                                            </div>
+                                            ` : ''}
+                                            <div class="flex items-center gap-2 mb-3">
+                                                <span class="tag">${location}</span>
+                                                <span class="text-gray-400">•</span>
+                                                <span class="text-sm text-gray-500">${articleDate}</span>
+                                            </div>
+                                            <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-3 leading-tight">${randomArticle.title || 'No Title Available'}</h2>
+                                            <p class="text-gray-600 mb-4 leading-relaxed">${randomArticle.body ? randomArticle.body.substring(0, 250) + '...' : 'No summary available.'}</p>
+                                            <div class="flex flex-wrap items-center justify-between gap-4">
+                                                <div>
+                                                    ${randomArticle.source && randomArticle.source.title ? `
+                                                    <p class="text-sm text-gray-500">Source: 
+                                                        <a href="${randomArticle.url}" target="_blank" class="text-blue-600 hover:underline font-medium">
+                                                            ${randomArticle.source.title} <i class="fas fa-external-link-alt ml-1 text-xs"></i>
+                                                        </a>
+                                                    </p>
+                                                    ` : '<p class="text-sm text-gray-500">Source: Unknown</p>'}
+                                                </div>
+                                                <a href="${randomArticle.url || '#'}" target="_blank" class="read-more">
+                                                    Read full story <i class="fas fa-arrow-right ml-1 text-xs"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+
+                                $('#news-container').html(articleHtml).show();
+                            } else {
+                                console.log('No articles found in response:', response); // Debug log
+                                $('#empty-state').show();
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('API Error:', xhr, status, error); // Debug log
+                            $('#loading').hide();
+                            $('#skeleton-loader').hide();
+                            $('#news-container').show();
+                            $('#get-news-btn').prop('disabled', false).html('<i class="fas fa-sync-alt"></i><span>Get Random News</span>');
+                            
+                            let errorMsg = 'Error fetching news. Please try again.';
+                            if (xhr.responseJSON && xhr.responseJSON.error) {
+                                errorMsg = xhr.responseJSON.error;
+                            }
+                            
+                            $('#news-container').html(`
+                                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded">
+                                    <div class="flex">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-exclamation-circle text-red-500 mt-1"></i>
+                                        </div>
+                                        <div class="ml-3">
+                                            <p class="text-sm text-red-700">${errorMsg}</p>
+                                        </div>
+                                    </div>
                                 </div>
-                            `;
-
-                            $('#news-container').html(articleHtml);
-                        } else {
-                            $('#news-container').html('<p class="text-red-500 text-center">No articles found for the specified criteria.</p>');
+                            `).show();
                         }
-                    },
-                    error: function(xhr, status, error) {
-                        $('#loading').hide();
-                        $('#news-container').html(`<p class="text-red-500 text-center">Error fetching news: ${error}</p>`);
-                    }
-                });
+                    });
+                }, 300);
             });
+            
+            // Trigger first load on page load
+            $('#get-news-btn').trigger('click');
         });
     </script>
 </body>
